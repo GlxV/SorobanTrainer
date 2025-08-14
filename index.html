@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soroban Trainer — GLXV</title>
+  <style>
+    :root{
+      --bg1:#060b14; --bg2:#0b1424;
+      --acc:#5aa9ff; --acc2:#00d4ff;
+      --txt:#e8ecf4; --muted:#98a5bb;
+      --card: rgba(20,32,56,0.35);
+      --stroke: rgba(148, 192, 255, 0.18);
+      --shadow: 0 10px 30px rgba(3,8,20,.45), inset 0 1px 0 rgba(255,255,255,.04);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--txt);
+      min-height:100vh;
+      position:relative;
+      background:transparent;
+    }
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--txt);
+      background:
+        radial-gradient(900px 700px at 12% 18%, rgba(40,82,140,.55) 0%, rgba(18,24,38,0) 60%),
+        radial-gradient(1000px 800px at 88% 12%, rgba(14,54,112,.55) 0%, rgba(18,24,38,0) 60%),
+        radial-gradient(800px 650px at 50% 85%, rgba(18,72,129,.45) 0%, rgba(18,24,38,0) 58%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      background-repeat:no-repeat;
+      background-size:120% 120%,120% 120%,120% 120%, cover;
+      animation: float-bg 26s ease-in-out infinite alternate;
+      min-height:100vh;
+    }
+    @keyframes float-bg{
+      0%{background-position:0% 0%, 100% 0%, 50% 100%, 50% 50%;}
+      50%{background-position:10% 6%, 90% 8%, 55% 80%, 50% 50%;}
+      100%{background-position:20% 12%, 80% 18%, 60% 65%, 50% 50%;}
+    }
+      50%{background-position:10% 6%, 90% 8%, 55% 80%, 50% 50%;}
+      100%{background-position:20% 12%, 80% 18%, 60% 65%, 50% 50%;}
+    }
+    @media (prefers-reduced-motion: reduce){ body::before{animation:none} } }
+
+    header{display:flex; align-items:center; gap:14px; padding:20px 22px; border-bottom:1px solid var(--stroke); backdrop-filter:saturate(120%) blur(12px); position:sticky; top:0; z-index:50; background:linear-gradient(180deg, rgba(11,20,36,.65), rgba(11,20,36,.18));}
+    .logo{display:flex; align-items:center; gap:10px}
+    .logo .mark{width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,var(--acc),var(--acc2)); box-shadow:var(--shadow)}
+    h1{font-size:18px; margin:0; letter-spacing:.2px}
+
+    .container{max-width:1100px; margin:24px auto 60px; padding:0 18px;}
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:18px}
+
+    .card{background:var(--card); border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); backdrop-filter: blur(16px) saturate(120%);}
+    .card .hd{display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--stroke)}
+    .card .hd h2{margin:0; font-size:16px; font-weight:600}
+    .card .bd{padding:18px}
+
+    .controls{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px;}
+    label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+    input[type="number"], select{width:100%; padding:12px 12px; background:rgba(255,255,255,.04); color:var(--txt); border:1px solid var(--stroke); border-radius:12px; outline:none}
+    input[type="checkbox"]{transform: translateY(1px)}
+
+    .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+    .btn{padding:11px 14px; border-radius:12px; border:1px solid var(--stroke); color:var(--txt); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); cursor:pointer; letter-spacing:.2px; font-weight:600; box-shadow:var(--shadow)}
+    .btn.primary{background:linear-gradient(180deg, rgba(90,169,255,.35), rgba(0,212,255,.2)); border-color:rgba(122,184,255,.55)}
+    .btn.ghost{background:transparent}
+    .btn:active{transform:translateY(1px)}
+
+    .display{font-variant-numeric: tabular-nums; user-select: none; text-align:center; border-radius:16px; padding:28px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border:1px dashed var(--stroke)}
+    .big-number{font-size: clamp(32px, 8vw, 68px); font-weight:800; letter-spacing: .02em}
+
+    .timer{display:flex; align-items:center; justify-content:center; gap:10px; font-variant-numeric: tabular-nums;}
+    .timer .time{font-size:28px; font-weight:800}
+    .pill{display:inline-flex; gap:8px; align-items:center; background:rgba(255,255,255,.06); border:1px solid var(--stroke); padding:8px 12px; border-radius:999px; font-size:12px; color:var(--muted)}
+
+    .list{display:flex; flex-direction:column; gap:8px}
+    .sum{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid var(--stroke)}
+    .sum .expr{font-size:18px; font-weight:700}
+    .sum .ans{font-variant-numeric: tabular-nums; opacity:.12}
+    .sum.revealed .ans{opacity:1}
+
+    .toast{position: fixed; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(14,24,40,.6); border:1px solid var(--stroke); border-radius:14px; padding:12px 16px; box-shadow:var(--shadow); display:none; z-index:100; font-weight:700}
+
+    /* Memes */
+    .memes-toggle{position:fixed; right:18px; bottom:18px; z-index:120}
+    .memes-panel{position:fixed; right:18px; bottom:70px; width:280px; max-width:calc(100% - 36px); background:var(--card); border:1px solid var(--stroke); border-radius:16px; box-shadow:var(--shadow); backdrop-filter: blur(16px) saturate(120%); display:none; z-index:120}
+    .memes-panel .hd{padding:12px 14px; border-bottom:1px solid var(--stroke); font-weight:700}
+    .memes-panel .bd{padding:10px 12px; display:flex; flex-direction:column; gap:8px}
+    .meme-btn{padding:8px 10px; border-radius:10px; border:1px solid var(--stroke); background:rgba(255,255,255,.05); color:var(--txt); cursor:pointer; text-align:left}
+
+    @media (max-width: 920px){ .grid{grid-template-columns: 1fr;} }
+      body::before{
+      content:""; position:fixed; inset:0; z-index:-1;
+      background:
+        radial-gradient(900px 700px at 12% 18%, rgba(40,82,140,.55) 0%, rgba(18,24,38,0) 60%),
+        radial-gradient(1000px 800px at 88% 12%, rgba(14,54,112,.55) 0%, rgba(18,24,38,0) 60%),
+        radial-gradient(800px 650px at 50% 85%, rgba(18,72,129,.45) 0%, rgba(18,24,38,0) 58%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      background-repeat:no-repeat;
+      background-size:120% 120%,120% 120%,120% 120%, cover;
+      animation: float-bg 26s ease-in-out infinite alternate;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><div class="mark"></div><h1>Soroban Trainer</h1></div>
+    <!-- Removido o pill de tema/versão -->
+  </header>
+
+  <div class="container">
+    <div class="grid" id="view-numeros">
+      <section class="card">
+        <div class="hd"><h2>Gerador de Números</h2></div>
+        <div class="bd">
+          <div class="controls">
+            <div>
+              <label>Quantidade de dígitos</label>
+              <input type="number" id="digits-num" min="1" max="12" value="3" />
+            </div>
+            <div>
+              <label><input type="checkbox" id="leading-zeros" /> Permitir zeros à esquerda</label>
+            </div>
+          </div>
+          <div class="btns">
+            <button class="btn primary" id="btn-new-number">Gerar número</button>
+            <button class="btn" id="btn-toggle-number">Mostrar/Esconder</button>
+            <button class="btn ghost" id="btn-reset-timer-1">Resetar Tempo</button>
+          </div>
+          <div class="bd" style="padding-left:0;padding-right:0">
+            <div class="display" style="margin-top:12px">
+              <div class="big-number" id="random-number">•••</div>
+            </div>
+            <div class="timer" style="margin-top:14px">
+              <div class="pill">Tempo atual: <span class="time" id="timer-1">00:00.000</span></div>
+              <div class="pill">Melhor: <span id="best-1">—</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid" id="view-somas">
+      <section class="card">
+        <div class="hd"><h2>Gerador de Somas</h2></div>
+        <div class="bd">
+          <div class="controls">
+            <div>
+              <label>Dígitos (cada termo)</label>
+              <input type="number" id="digits-sum" min="1" max="8" value="3" />
+            </div>
+            <div>
+              <label>Quantidade de termos</label>
+              <input type="number" id="terms" min="2" max="8" value="3" />
+            </div>
+          </div>
+          <div class="btns">
+            <button class="btn primary" id="btn-new-sum">Gerar soma</button>
+            <button class="btn" id="btn-reveal-sum">Revelar resultado</button>
+            <button class="btn ghost" id="btn-reset-timer-2">Resetar Tempo</button>
+          </div>
+          <div class="display" style="margin-top:12px">
+            <div class="list" id="sum-list"></div>
+          </div>
+          <div class="timer" style="margin-top:14px">
+            <div class="pill">Tempo atual: <span class="time" id="timer-2">00:00.000</span></div>
+            <div class="pill">Melhor: <span id="best-2">—</span></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Toast + Memes UI -->
+  <div class="toast" id="toast"></div>
+  <div class="memes-toggle"><button class="btn" id="btn-memes">👀 Memes</button></div>
+  <div class="memes-panel" id="memes-panel" aria-hidden="true">
+    <div class="hd">Memes brasileiros 🇧🇷</div>
+    <div class="bd">
+      <button class="meme-btn" data-meme="🔥 Tá pegando fogo, bicho!">🔥 Tá pegando fogo, bicho!</button>
+      <button class="meme-btn" data-meme="🐔 Galo cego!">🐔 Galo cego!</button>
+      <button class="meme-btn" data-meme="🧔 Tio Paulo aprovou.">🧔 Tio Paulo aprovou.</button>
+      <button class="meme-btn" data-meme="🤷 Irineu, você não sabe nem eu!">🤷 Irineu, você não sabe nem eu!</button>
+      <button class="meme-btn" data-meme="😎 Amostradinho!">😎 Amostradinho!</button>
+      <button class="meme-btn" data-meme="🏃 Bora, Bill!">🏃 Bora, Bill!</button>
+    </div>
+  </div>
+
+  <script>
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const show = el => el.style.display = 'block';
+    const hide = el => el.style.display = 'none';
+
+    function randInt(min, max){return Math.floor(Math.random()*(max-min+1))+min;}
+    function randomWithDigits(d, allow0=false){const min=allow0?0:Math.pow(10,d-1);const max=Math.pow(10,d)-1;return randInt(min,max);}
+    function formatTime(ms){const m=Math.floor(ms/60000).toString().padStart(2,'0');const s=Math.floor((ms%60000)/1000).toString().padStart(2,'0');const ms3=Math.floor(ms%1000).toString().padStart(3,'0');return `${m}:${s}.${ms3}`;}
+
+    const memes=['🔥 Tá pegando fogo, bicho!','🐔 Galo cego!','🧔 Tio Paulo aprovou.','🤷 Irineu, você não sabe nem eu!','😎 Amostradinho!','🏃 Bora, Bill!'];
+    function toast(msg){const t=$('#toast');t.textContent=msg;show(t);setTimeout(()=>hide(t),1800);} 
+    function maybeMeme(force=false){if(force||Math.random()<0.18){toast(memes[randInt(0,memes.length-1)]);}}
+
+    function createTimer(elTimer,elBest){
+      let running=false,start=0,raf=0,elapsed=0,best=null;
+      function loop(){const now=performance.now();const ms=now-start+elapsed;elTimer.textContent=formatTime(ms);raf=requestAnimationFrame(loop);} 
+      return{
+        start(){if(running)return;running=true;start=performance.now();raf=requestAnimationFrame(loop);},
+        pause(){if(!running)return;running=false;cancelAnimationFrame(raf);elapsed+=performance.now()-start;},
+        reset(){running=false;cancelAnimationFrame(raf);start=0;elapsed=0;elTimer.textContent='00:00.000';},
+        mark(){ this.pause(); const ms = elapsed; if(best===null||ms<best){ best = ms; elBest.textContent = formatTime(best); } },
+        isRunning(){return running;}
+      };
+    }
+
+    // NÚMEROS
+    const t1=createTimer($('#timer-1'),$('#best-1'));
+    let hiddenNumber=''; let isHidden=true;
+    function generateNumber(){
+      const d=Math.max(1,Math.min(12,parseInt($('#digits-num').value||'1')));
+      const allow0=$('#leading-zeros').checked;
+      let n=randomWithDigits(d,allow0);
+      if(allow0) n=n.toString().padStart(d,'0');
+      hiddenNumber=n.toString();
+      isHidden=true; $('#random-number').textContent='•'.repeat(hiddenNumber.length);
+      t1.reset();
+    }
+    function toggleNumber(){
+      if(!hiddenNumber) return;
+      isHidden=!isHidden;
+      $('#random-number').textContent = isHidden ? '•'.repeat(hiddenNumber.length) : hiddenNumber;
+      if(isHidden){ t1.mark(); }
+      else { t1.start(); maybeMeme(false); }
+    }
+    $('#btn-new-number').onclick=generateNumber;
+    $('#btn-toggle-number').onclick=toggleNumber;
+    $('#btn-reset-timer-1').onclick=()=>t1.reset();
+
+    window.addEventListener('keydown',e=>{
+      if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+      if(e.key===' '){ e.preventDefault(); toggleNumber(); }
+      if(e.key==='n'||e.key==='N'){ generateNumber(); }
+      if(e.key==='r'||e.key==='R'){ t1.reset(); }
+    });
+
+    // SOMAS (inalterado)
+    const t2=createTimer($('#timer-2'),$('#best-2'));
+    let currentSum={terms:[],total:0, revealed:false};
+    function generateSum(){
+      const d=Math.max(1,Math.min(8,parseInt($('#digits-sum').value||'1')));
+      const k=Math.max(2,Math.min(8,parseInt($('#terms').value||'2')));
+      const min=Math.pow(10,d-1); const max=Math.pow(10,d)-1;
+      const arr=Array.from({length:k},()=>randInt(min,max));
+      const total=arr.reduce((a,b)=>a+b,0);
+      currentSum={terms:arr,total,revealed:false};
+      renderSum(); t2.reset(); t2.start(); maybeMeme(false);
+    }
+    function renderSum(){
+      $('#sum-list').innerHTML='';
+      currentSum.terms.forEach((n,i)=>{
+        const row=document.createElement('div'); row.className='sum';
+        const expr=document.createElement('div'); expr.className='expr'; expr.textContent=(i===0?'':'+ ')+n.toLocaleString('pt-BR');
+        const ans=document.createElement('div'); ans.className='ans';
+        ans.textContent = i===currentSum.terms.length-1 ? `= ${currentSum.revealed? currentSum.total.toLocaleString('pt-BR'):'???'}` : '';
+        if(currentSum.revealed) row.classList.add('revealed');
+        row.appendChild(expr); row.appendChild(ans);
+        $('#sum-list').appendChild(row);
+      });
+    }
+    function revealSum(){ if(!currentSum.terms.length) return; currentSum.revealed=true; renderSum(); t2.mark(); maybeMeme(false); }
+    $('#btn-new-sum').onclick=generateSum; $('#btn-reveal-sum').onclick=revealSum; $('#btn-reset-timer-2').onclick=()=>t2.reset();
+
+    // Memes UI
+    const panel=$('#memes-panel');
+    $('#btn-memes').onclick=()=>{panel.style.display=panel.style.display==='block'?'none':'block'; panel.setAttribute('aria-hidden', panel.style.display==='block'?'false':'true');};
+    $$('.meme-btn').forEach(btn=>btn.addEventListener('click',()=>{toast(btn.dataset.meme);}));
+
+    // Init
+    generateNumber();
+  </script>
+</body>
+</html>
